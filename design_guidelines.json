@@ -1,160 +1,123 @@
 {
-  "theme_and_archetype": {
-    "theme": "Light",
-    "archetype": "4 (Swiss & High-Contrast)",
-    "description": "Clean, modern industrial/tech e-commerce aesthetic emphasizing clarity, precise technical data, and high-trust B2B transactions. Focuses on stark white backgrounds, monochrome structural elements, and a high-visibility primary color for functional actions."
+  "theme": "light",
+  "archetype": "Archetype 4: Swiss & High-Contrast (Adapted for MNC E-commerce)",
+  "brand": {
+    "name": "PartStation.in",
+    "tagline": "Your Parts Destination",
+    "colors": {
+      "primary": "#2B5CC6",
+      "accent": "#F5821F",
+      "background": "#FFFFFF",
+      "surface": "#F8FAFC",
+      "text_main": "#0F172A",
+      "text_muted": "#64748B",
+      "border": "#E2E8F0",
+      "success": "#16A34A",
+      "warning": "#EAB308",
+      "error": "#DC2626"
+    }
   },
   "typography": {
-    "primary_font": "Cabinet Grotesk",
-    "secondary_font": "IBM Plex Sans",
-    "usage": {
-      "h1": "font-cabinet-grotesk text-4xl sm:text-5xl lg:text-6xl tracking-tight font-black",
-      "h2": "font-cabinet-grotesk text-2xl sm:text-3xl lg:text-4xl tracking-tight font-bold",
-      "h3": "font-cabinet-grotesk text-xl sm:text-2xl font-bold",
-      "h4": "font-cabinet-grotesk text-lg sm:text-xl font-semibold",
-      "body": "font-ibm-plex text-base leading-relaxed text-gray-700",
-      "small_labels": "font-ibm-plex text-xs uppercase tracking-[0.2em] font-medium text-gray-500",
-      "sku_numbers": "font-ibm-plex text-sm font-mono text-gray-800 bg-gray-100 px-1.5 py-0.5 rounded-sm"
+    "headings": {
+      "font_family": "Outfit, sans-serif",
+      "weight": "600-700",
+      "tracking": "tracking-tight"
+    },
+    "body": {
+      "font_family": "Mukta, sans-serif",
+      "weight": "400",
+      "notes": "Mukta provides excellent readability for dense data and strong Devanagari/Hindi support."
+    },
+    "scale": {
+      "h1": "text-3xl sm:text-4xl lg:text-5xl",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl",
+      "h3": "text-xl sm:text-2xl",
+      "body": "text-sm sm:text-base",
+      "small": "text-xs sm:text-sm"
     }
   },
-  "colors": {
-    "background": {
-      "default": "#FFFFFF",
-      "surface": "#F9FAFB",
-      "surface_alt": "#F3F4F6",
-      "inverse": "#111827"
-    },
-    "text": {
-      "primary": "#111827",
-      "secondary": "#4B5563",
-      "tertiary": "#6B7280",
-      "inverse": "#FFFFFF",
-      "accent": "#0052FF"
-    },
-    "brand": {
-      "primary": "#0052FF",
-      "primary_hover": "#0040CC",
-      "secondary": "#FF6B00",
-      "secondary_hover": "#E66000"
-    },
-    "status": {
-      "success": "#059669",
-      "success_bg": "#D1FAE5",
-      "warning": "#D97706",
-      "warning_bg": "#FEF3C7",
-      "danger": "#DC2626",
-      "danger_bg": "#FEE2E2",
-      "info": "#2563EB",
-      "info_bg": "#DBEAFE"
-    },
-    "border": {
-      "default": "#E5E7EB",
-      "focus": "#0052FF"
+  "spacing_and_layout": {
+    "mobile_first_rules": [
+      "Use bottom navigation bar on mobile (Home, Categories, Cart, Account).",
+      "Sticky top header with search bar visible at all times on mobile.",
+      "Product Detail Page (PDP) must have a sticky 'Add to Cart' / 'Buy Now' bottom bar on mobile.",
+      "Use horizontal scrolling rails for categories, brands, and deals-of-the-day on mobile.",
+      "Product grids on mobile should be 2-column (grid-cols-2) with minimal gap (gap-2) to maximize image size."
+    ],
+    "container_padding": "px-4 sm:px-6 lg:px-8",
+    "section_gap": "gap-8 sm:gap-12 lg:gap-16",
+    "card_style": "bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow",
+    "elevation": {
+      "header": "shadow-sm",
+      "bottom_nav": "shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]",
+      "sticky_cta": "shadow-[0_-8px_16px_-4px_rgba(0,0,0,0.1)]",
+      "dropdown": "shadow-lg"
     }
-  },
-  "layout_and_spacing": {
-    "grid_system": {
-      "marketing_home": "Bento Grid (grid-cols-1 md:grid-cols-8 lg:grid-cols-12) with gap-8 to gap-12 for high-impact categories.",
-      "product_catalog": "Strict Grid (grid-cols-2 md:grid-cols-3 lg:grid-cols-4) with gap-4 or gap-6.",
-      "admin_dashboard": "Control Room Grid (grid-cols-1 md:grid-cols-3 lg:grid-cols-4) with gap-4, tight packing."
-    },
-    "spacing_scale": {
-      "container_padding": "px-4 md:px-8 lg:px-12",
-      "section_gap": "py-16 md:py-24",
-      "card_padding": "p-4 md:p-6",
-      "table_cell": "px-4 py-3"
-    },
-    "alignment": {
-      "headers": "Left-aligned for data and technical content, centered only for pure marketing hero.",
-      "numbers": "Right-aligned in tables (prices, quantities)."
-    }
-  },
-  "surface_strategies": {
-    "header": "Solid Background (#FFFFFF) with a hard bottom border (border-gray-200) for strict separation.",
-    "product_cards": "Grid Borders look: Flat white background, 1px subtle border (border-gray-200), zero shadow. Hover state: slight lift (-translate-y-1), shadow-lg, and border darkens to border-gray-400.",
-    "admin_widgets": "Neumorphism (Tactile) variant: Flat gray-50 background, 1px border-black/5, subtle ambient shadow. High contrast text.",
-    "modals_drawers": "Solid flat background with stark borders and dark backdrop overlay (bg-black/40)."
   },
   "components": {
     "buttons": {
-      "primary": "bg-[#0052FF] text-white rounded-sm font-medium px-6 py-2.5 transition-colors hover:bg-[#0040CC] focus:ring-2 focus:ring-[#0052FF] focus:ring-offset-2",
-      "secondary": "bg-white text-gray-900 border border-gray-300 rounded-sm font-medium px-6 py-2.5 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-200 focus:ring-offset-2",
-      "danger": "bg-red-600 text-white rounded-sm font-medium px-6 py-2.5 hover:bg-red-700",
-      "radius": "rounded-sm (max 4px) to maintain industrial rigidity."
+      "primary": "bg-[#2B5CC6] text-white hover:bg-[#224A9F] active:bg-[#1C3E85] font-semibold rounded-md transition-colors",
+      "accent": "bg-[#F5821F] text-white hover:bg-[#E07015] active:bg-[#C96210] font-semibold rounded-md transition-colors (Use for 'Buy Now' or 'Deals')",
+      "outline": "border border-slate-300 bg-transparent text-slate-700 hover:bg-slate-50 rounded-md transition-colors"
     },
     "inputs": {
-      "text": "border-gray-300 rounded-sm focus:border-[#0052FF] focus:ring-1 focus:ring-[#0052FF] bg-white text-gray-900 placeholder:text-gray-400",
-      "search_bar": "Massive top-header search. Large input (h-12 or h-14), explicit 'Search by SKU, Part Number, or Printer Model' placeholder, high-contrast Search button attached."
+      "style": "bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-[#2B5CC6] focus:border-transparent text-slate-900"
     },
-    "tables": {
-      "style": "Border-collapse, visible grid lines (border-b border-gray-200). Header row gets subtle bg (bg-gray-50) with uppercase tracking-wider text. Perfect for specifications and admin."
+    "badges": {
+      "deal": "bg-[#F5821F] text-white text-xs font-bold px-2 py-1 rounded-sm uppercase tracking-wider",
+      "discount": "text-[#16A34A] font-bold text-sm bg-green-50 px-2 py-0.5 rounded-sm",
+      "assured": "bg-[#2B5CC6] text-white text-xs font-semibold px-2 py-0.5 rounded-full inline-flex items-center gap-1"
     },
-    "trust_badges": {
-      "style": "Inline SVG icons paired with small IBM Plex Sans text. Colors mapped to Status (Success/Emerald for 'In Stock', 'GST Invoice'). Bordered container (border-gray-200 bg-gray-50 p-3 flex items-center gap-3)."
+    "product_card": {
+      "layout": "Vertical stack. Image container (aspect-square, bg-slate-50, p-2), Title (line-clamp-2, text-sm), Rating (stars + count), Price block (Current price, MRP strikethrough, % off), Delivery status, Quick Add button.",
+      "interactions": "Hover reveals quick add on desktop. Entire card is clickable."
+    },
+    "pdp_layout": {
+      "mobile": "Full-width image carousel, Title/Price/Badges, Delivery pincode check, Highlights chips, Specs Accordion, Description, Sticky bottom Add to Cart bar.",
+      "desktop": "Left sticky image gallery. Right scrollable details. Right-most sticky buy box (Amazon style)."
+    },
+    "login_page": {
+      "style": "Guest-first checkout pattern or OTP-first login. Clean centered card layout on desktop, full-screen clean flow on mobile. Use an aspirational office/tech hero image on the left half for desktop.",
+      "admin_login": "Separate secure portal look. Darker theme (bg-slate-900 text-white) to distinctly separate from consumer storefront. Sharp, high-contrast."
     }
   },
-  "design_patterns": {
-    "home_page": {
-      "hero": "Split layout: 60% text/search focused, 40% stark industrial image with minimal overlay.",
-      "categories": "Bento grid of categories with high-contrast text and solid background colors, hover to reveal image."
-    },
-    "product_details_page": {
-      "layout": "Two-column. Sticky left gallery (max-h-[80vh]). Right column dense with data: H1 Title, SKU badge, Price (MRP struck out + Selling Price + 'incl. GST' label). Pincode checker form. Add to Cart / Wishlist.",
-      "specifications": "Full width Grid Borders table below the fold. Two columns (Key | Value) strictly left-aligned."
-    },
-    "checkout_flow": {
-      "layout": "Clean, minimal interface. Strip away header navigation (leave only logo). Left column for address/pincode/payment selection. Right column for sticky Order Summary (GST explicit split).",
-      "payment_options": "Radio list with clear logos/text for PhonePe and Cash on Delivery."
-    },
-    "admin_panel": {
-      "layout": "Sidebar navigation (dark inverse or light with gray background), top bar for breadcrumbs/user. Content area uses 'The Control Room' grid. Dense tables for bulk product management."
-    }
-  },
-  "assets": {
-    "icons": {
-      "library": "@phosphor-icons/react",
-      "style": "Regular or Bold weight (not Duotone, to maintain industrial clarity). Use for navigation, technical specs, and trust badges."
-    },
-    "images": {
-      "hero_warehouse": {
-        "url": "https://images.pexels.com/photos/9574569/pexels-photo-9574569.jpeg",
-        "alt": "Modern laboratory featuring advanced printing equipment"
+  "media": {
+    "image_urls": [
+      {
+        "category": "hero_banners",
+        "description": "High-end office printer, representing main category",
+        "url": "https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwxfHxvZmZpY2UlMjBwcmludGVyfGVufDB8fHx8MTc4MjA2NzU4MHww&ixlib=rb-4.1.0&q=85"
       },
-      "category_motherboards": {
-        "url": "https://images.pexels.com/photos/28675583/pexels-photo-28675583.jpeg",
-        "alt": "Detailed view of electronic components on a computer motherboard"
+      {
+        "category": "hero_banners",
+        "description": "Modern printer with touchscreen, professional",
+        "url": "https://images.pexels.com/photos/17235421/pexels-photo-17235421.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
       },
-      "category_printers": {
-        "url": "https://images.pexels.com/photos/17235421/pexels-photo-17235421.jpeg",
-        "alt": "Close-up of a modern printer with a touchscreen interface"
+      {
+        "category": "category_networking",
+        "description": "Networking cables and switches",
+        "url": "https://images.pexels.com/photos/4818711/pexels-photo-4818711.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
       },
-      "category_logistics": {
-        "url": "https://images.pexels.com/photos/4487383/pexels-photo-4487383.jpeg",
-        "alt": "Workers handle a package in a spacious warehouse"
+      {
+        "category": "category_parts",
+        "description": "Circuit board, representing printer logic boards and computer parts",
+        "url": "https://images.pexels.com/photos/3520692/pexels-photo-3520692.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+      },
+      {
+        "category": "category_repair",
+        "description": "Laptop repair, representing service tools and spare parts",
+        "url": "https://images.pexels.com/photos/7639374/pexels-photo-7639374.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
       }
-    }
-  },
-  "accessibility_and_motion": {
-    "motion": "Minimalist. Hover states use fast transitions (150ms). No excessive parallax. Focus on micro-interactions (button press, dropdown slide) to maintain a fast, reliable tool feel.",
-    "accessibility": "Strict APCA/WCAG AA contrast ratios. Explicit focus rings (2px solid #0052FF with 2px offset) on all interactive elements. Support prefers-reduced-motion."
-  },
-  "testing_attributes": {
-    "convention": "data-testid",
-    "examples": [
-      "data-testid='search-input'",
-      "data-testid='search-submit-button'",
-      "data-testid='add-to-cart-button'",
-      "data-testid='pincode-check-input'",
-      "data-testid='checkout-phonepe-radio'",
-      "data-testid='admin-product-import-btn'"
-    ]
+    ],
+    "icons_library": "lucide-react"
   },
   "instructions_to_main_agent": [
-    "Strictly follow the color palette. Do NOT use generic Tailwind blue/gray unless it matches the hex codes provided.",
-    "Use @phosphor-icons/react for all icons. Install via: yarn add @phosphor-icons/react",
-    "Implement the UI using raw HTML/Tailwind for marketing/storefront pages to maintain the strict border-grid look.",
-    "Use Shadcn UI for the Admin Panel and complex form elements (Select, Dialogs, Tables) but customize border radii to be rounded-sm (max 4px).",
-    "Ensure all technical data (SKUs, Part Numbers, Specs) uses the IBM Plex Sans font.",
-    "Always include GST and Pincode shipping logic in the frontend display as mock placeholders until connected to backend."
+    "Ensure complete mobile responsiveness. The bottom tab navigation is critical for the consumer site on mobile screens (< 768px).",
+    "In product cards, do not center text. Left-align title, price, and ratings for better scannability.",
+    "For the header, implement a robust search bar that includes a dropdown for 'Search by Printer Model', 'Search by Part Number', etc.",
+    "Implement language toggle (EN/HI) cleanly in the top utility bar.",
+    "The login screen for customers should be a clean, high-conversion OTP/Email flow. The admin login should have a distinctly different, darker 'secure portal' aesthetic.",
+    "Use standard Shadcn components but strip away heavy radiuses. Use rounded-md (6px) or rounded-lg (8px) for a more authoritative MNC e-commerce look.",
+    "All interactive elements must have data-testid attributes for testing."
   ]
 }
