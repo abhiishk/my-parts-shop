@@ -97,4 +97,29 @@ if (isDevServer) {
   }
 }
 
+// Sanitize deprecated webpack-dev-server v4 middleware hooks injected by tooling
+const _origDevServer = webpackConfig.devServer;
+webpackConfig.devServer = (devServerConfig) => {
+  let cfg = typeof _origDevServer === "function" ? _origDevServer(devServerConfig) : devServerConfig;
+  if (cfg && (cfg.onAfterSetupMiddleware || cfg.onBeforeSetupMiddleware)) {
+    const after = cfg.onAfterSetupMiddleware;
+    const before = cfg.onBeforeSetupMiddleware;
+    delete cfg.onAfterSetupMiddleware;
+    delete cfg.onBeforeSetupMiddleware;
+    const origSetup = cfg.setupMiddlewares;
+    cfg.setupMiddlewares = (middlewares, devServer) => {
+      if (before) before(devServer);
+      const result = origSetup ? origSetup(middlewares, devServer) : middlewares;
+      if (after) after(devServer);
+      return result;
+    };
+  }
+  if (cfg && "https" in cfg) {
+    if (cfg.https && !cfg.server) cfg.server = "https";
+    delete cfg.https;
+  }
+  if (cfg && "http2" in cfg) delete cfg.http2;
+  return cfg;
+};
+
 module.exports = webpackConfig;
