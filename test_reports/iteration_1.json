@@ -1,0 +1,49 @@
+{
+  "summary": "First QA pass for PartStation.in MVP. Backend: 35/35 pytest passed (catalog, shipping, auth, orders+invoice, admin CRUD, CSV import, RBAC). Frontend: home, search, shop filters, product detail, pincode check, add-to-cart, register, admin dashboard/products/orders/categories/brands/blog/settings all work. ONE CRITICAL UX BUG: after placing a COD order, the user is redirected to /cart instead of /order-success/:id (order IS created on backend — visible in /account and admin orders). Root cause is a useEffect race in Checkout.jsx.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Checkout (src/pages/Checkout.jsx)",
+        "issue": "After Place Order succeeds, app navigates to /cart instead of /order-success/:id. Order is correctly created (PS26061003 visible in /account and admin dashboard) but user never sees the success page with the order-number element.",
+        "selector": "[data-testid=\"place-order-button\"]",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Fix Checkout.jsx race condition: the redirect-to-cart useEffect (lines 21-25) fires after clearCart() empties items, racing with navigate('/order-success/:id'). Fix options: (a) add an 'ordered' state flag and skip the items.length===0 redirect when placing succeeded, (b) navigate('/order-success/:id') BEFORE clearCart(), or (c) move the redirect-to-cart logic to only run on initial mount.",
+    "Optional: add data-testid='admin-nav-pincodes' and 'admin-nav-import' (currently they resolve to 'admin-nav-shipping' and 'admin-nav-bulk' because of slug-from-label logic in AdminLayout) for test stability.",
+    "Optional: add data-testid='order-success' wrapper on /order-success page to make success-page assertions more robust."
+  ],
+  "critical_code_review_comments": [
+    "Checkout.jsx useEffect (lines 21-25) checks items.length===0 -> navigate('/cart'), which collides with the success path that clears the cart. This is the root cause of the order-success page never being shown.",
+    "server.py: /api/orders payment_status defaults to 'pending' for both COD and non-COD; for COD, a status like 'cod_pending' or 'pending_cod' may be clearer, but not a bug.",
+    "server.py uses @app.on_event('startup'/'shutdown') which is deprecated in FastAPI; migrate to lifespan handlers eventually (non-blocking).",
+    "server.py is 743 lines and growing — consider splitting into routers (auth, catalog, orders, admin) for maintainability.",
+    "Admin endpoints: update_category/update_pincode/update_blog do data.pop('_id'); good. update_settings does not strip nested _id but settings come from form so likely fine.",
+    "CORS uses allow_credentials=True with allow_origins='*' from env default — when CORS_ORIGINS is '*' and credentials are allowed, browsers will reject. Currently works because auth is via Bearer header not cookies, but the combination is invalid per spec. Either set explicit origins or set allow_credentials=False."
+  ],
+  "updated_files": [
+    "/app/backend/tests/backend_test.py (created)"
+  ],
+  "success_rate": {
+    "backend": "100% (35/35 pytest)",
+    "frontend": "~92% — purchase flow places order successfully on backend but UI redirects to /cart instead of order-success"
+  },
+  "test_credentials": "Admin: admin@partstation.com / Admin@12345 (verified). Customer: registered ad-hoc via /api/auth/register with random email and password Test@12345.",
+  "seed_data_creation": "Test customers + orders (PS26061001/1002/1003) and TEST_QA_* admin items were created and cleaned up by pytest. One residual order PS26061003 is present on the live DB from the frontend purchase-flow test (acceptable for re-test verification).",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend regression suite is at /app/backend/tests/backend_test.py — re-run with `pytest /app/backend/tests/backend_test.py -v`. For the Checkout redirect bug, reproduce by: (1) register a new customer at /login, (2) add any product to cart, (3) go to /checkout, fill addr-full_name/phone/line1/city/state/pincode=110001, click checkout-cod-radio, click place-order-button. Expected URL: /order-success/<id>. Actual URL: /cart. Confirm fix by checking that data-testid='order-number' becomes visible after place-order.",
+  "rca_of_the_issue": "Checkout.jsx maintains a useEffect dependent on items.length. On successful order: clearCart() runs -> items becomes [] -> useEffect re-runs and calls navigate('/cart'). This navigate runs in the same tick as the success navigate('/order-success/:id'), and React's last-write wins means the /cart redirect overrides. Mitigation: gate the empty-cart redirect with a `!placing && !placedRef.current` check, or perform navigate('/order-success/...') before clearCart() (success page reads order from API independently, so cart state is not required)."
+}
