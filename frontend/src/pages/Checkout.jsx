@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Check, MapPin, CreditCard, Banknote } from "lucide-react";
 import { useCart } from "../context/CartContext";
@@ -17,10 +17,11 @@ export default function Checkout() {
   const [ship, setShip] = useState(null);
   const [payment, setPayment] = useState("cod");
   const [placing, setPlacing] = useState(false);
+  const placedRef = useRef(false);
 
   useEffect(() => {
     if (!loading && !user) navigate("/login?redirect=/checkout");
-    if (!loading && items.length === 0) navigate("/cart");
+    if (!loading && items.length === 0 && !placedRef.current) navigate("/cart");
     if (user) setAddress((a) => ({ ...a, full_name: user.name, phone: user.phone || "" }));
   }, [user, loading, items.length, navigate]);
 
@@ -47,8 +48,9 @@ export default function Checkout() {
         address,
         payment_method: payment,
       });
-      clearCart();
+      placedRef.current = true;
       navigate(`/order-success/${order.id}`);
+      clearCart();
     } catch (e) {
       toast.error(e.response?.data?.detail || "Could not place order");
     } finally {

@@ -13,7 +13,7 @@ export default function OrderSuccess() {
   }, [id]);
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-16 text-center animate-fade-up">
+    <div data-testid="order-success" className="max-w-2xl mx-auto px-4 py-16 text-center animate-fade-up">
       <CheckCircle2 size={64} className="mx-auto text-emerald-500" />
       <h1 className="font-cabinet text-3xl font-black mt-4">Order Placed!</h1>
       <p className="text-gray-600 mt-2">Thank you for your order. A confirmation email has been sent.</p>
