@@ -21,6 +21,7 @@ import BlogDetail from "./pages/BlogDetail";
 import StaticPage from "./pages/StaticPage";
 
 import AdminLayout from "./admin/AdminLayout";
+import AdminLogin from "./admin/AdminLogin";
 import AdminDashboard from "./admin/AdminDashboard";
 import AdminProducts from "./admin/AdminProducts";
 import AdminImport from "./admin/AdminImport";
@@ -56,6 +57,7 @@ function App() {
                 </Route>
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/admin/login" element={<AdminLogin />} />
 
                 <Route path="/admin" element={<AdminLayout />}>
                   <Route index element={<AdminDashboard />} />

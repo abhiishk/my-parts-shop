@@ -29,6 +29,7 @@ export const api = {
   categories: () => client.get("/categories").then((r) => r.data),
   category: (slug) => client.get(`/categories/${slug}`).then((r) => r.data),
   brands: () => client.get("/brands").then((r) => r.data),
+  printerModels: () => client.get("/printer-models").then((r) => r.data),
   products: (params) => client.get("/products", { params }).then((r) => r.data),
   product: (slug) => client.get(`/products/${slug}`).then((r) => r.data),
   settings: () => client.get("/settings").then((r) => r.data),

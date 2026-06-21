@@ -126,6 +126,11 @@ async def list_brands():
     return await db.brands.find({}, NO_ID).sort("name", 1).to_list(200)
 
 
+@api.get("/printer-models")
+async def list_printer_models():
+    return await db.printer_models.find({}, NO_ID).to_list(100)
+
+
 @api.get("/products")
 async def list_products(
     q: Optional[str] = None,

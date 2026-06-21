@@ -1,33 +1,29 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Search, Printer, Cpu, Laptop, Network } from "lucide-react";
+import { ArrowRight, ChevronRight, Printer, BadgeIndianRupee, Truck, ShieldCheck, CreditCard } from "lucide-react";
 import { api } from "../lib/api";
 import { ProductCard } from "../components/storefront/ProductCard";
-import { useI18n } from "../context/I18nContext";
 
-const HERO_IMG = "https://images.pexels.com/photos/9574569/pexels-photo-9574569.jpeg?auto=compress&w=1000";
+const HERO = "https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=1200&q=80";
 
-const Section = ({ title, sub, link, children }) => (
-  <section className="max-w-7xl mx-auto px-4 md:px-8 py-10">
-    <div className="flex items-end justify-between mb-6">
-      <div>
-        <h2 className="font-cabinet text-2xl md:text-3xl font-bold tracking-tight">{title}</h2>
-        {sub && <p className="text-sm text-gray-500 mt-1">{sub}</p>}
-      </div>
-      {link && (
-        <Link to={link} className="text-sm font-medium text-brand hover:underline flex items-center gap-1 shrink-0">
-          View All <ArrowRight size={16} />
-        </Link>
-      )}
+const Rail = ({ title, link, products }) => (
+  <section className="bg-white rounded-lg border border-slate-200 mt-3">
+    <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+      <h2 className="font-display text-lg sm:text-xl font-bold text-ink">{title}</h2>
+      {link && <Link to={link} className="text-sm font-semibold text-brand flex items-center gap-1">View All <ChevronRight size={16} /></Link>}
     </div>
-    {children}
+    <div className="flex gap-3 overflow-x-auto no-scrollbar p-3 sm:grid sm:grid-cols-3 lg:grid-cols-6">
+      {products.map((p) => (
+        <div key={p.id} className="min-w-[160px] sm:min-w-0"><ProductCard product={p} /></div>
+      ))}
+    </div>
   </section>
 );
 
 export default function Home() {
-  const { t } = useI18n();
   const [cats, setCats] = useState([]);
   const [brands, setBrands] = useState([]);
+  const [models, setModels] = useState([]);
   const [featured, setFeatured] = useState([]);
   const [newArr, setNewArr] = useState([]);
   const [settings, setSettings] = useState(null);
@@ -35,113 +31,95 @@ export default function Home() {
   useEffect(() => {
     api.categories().then(setCats).catch(() => {});
     api.brands().then(setBrands).catch(() => {});
-    api.products({ featured: true, limit: 8 }).then((d) => setFeatured(d.items)).catch(() => {});
-    api.products({ new_arrival: true, limit: 8, sort: "newest" }).then((d) => setNewArr(d.items)).catch(() => {});
+    api.printerModels().then(setModels).catch(() => {});
+    api.products({ featured: true, limit: 12 }).then((d) => setFeatured(d.items)).catch(() => {});
+    api.products({ new_arrival: true, limit: 12, sort: "newest" }).then((d) => setNewArr(d.items)).catch(() => {});
     api.settings().then(setSettings).catch(() => {});
   }, []);
 
   return (
-    <div className="animate-fade-up">
+    <div className="max-w-[1400px] mx-auto px-2 sm:px-4 lg:px-8 py-3">
       {/* Hero */}
-      <section className="bg-ink text-white">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 grid lg:grid-cols-5 gap-8 items-center py-12 md:py-16">
-          <div className="lg:col-span-3">
-            <span className="label-xs text-brand">India's Spare Parts Marketplace</span>
-            <h1 className="font-cabinet text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight mt-3 leading-[1.05]">
-              {settings?.hero_title || "Genuine Printer & IT Spare Parts, Shipped Across India"}
-            </h1>
-            <p className="text-gray-300 mt-4 text-base md:text-lg max-w-xl">
-              {settings?.hero_subtitle || "Printer heads, formatter boards, fusers, laptop & computer parts — with GST invoice, COD and fast delivery."}
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link to="/shop" data-testid="hero-shop-btn" className="h-12 px-6 bg-brand text-white rounded-sm font-medium flex items-center gap-2 hover:bg-brand-hover transition-colors">
-                Browse Parts <ArrowRight size={18} />
-              </Link>
-              <Link to="/shop?category=printer-parts" className="h-12 px-6 bg-white/10 border border-white/20 text-white rounded-sm font-medium flex items-center hover:bg-white/20 transition-colors">
-                Printer Parts
-              </Link>
-            </div>
-            <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-xs text-gray-400">
-              <span>✓ GST Invoice</span><span>✓ COD Available</span><span>✓ India-wide Shipping</span><span>✓ Secure Payments</span>
-            </div>
-          </div>
-          <div className="lg:col-span-2">
-            <div className="aspect-[4/3] rounded-sm overflow-hidden border border-white/10">
-              <img src={HERO_IMG} alt="Industrial printing equipment" className="w-full h-full object-cover" />
-            </div>
+      <section className="relative rounded-lg overflow-hidden bg-brand-dark">
+        <img src={HERO} alt="" className="absolute inset-0 w-full h-full object-cover opacity-25" />
+        <div className="relative px-5 sm:px-10 py-8 sm:py-12 max-w-2xl">
+          <span className="inline-block bg-brand-orange text-white text-[11px] font-bold px-2.5 py-1 rounded uppercase tracking-wide">India's Spare Parts Marketplace</span>
+          <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mt-3 leading-[1.1]">
+            {settings?.hero_title || "Genuine Printer & IT Spare Parts, Delivered Across India"}
+          </h1>
+          <p className="text-white/80 mt-3 text-sm sm:text-base">
+            {settings?.hero_subtitle || "Toners, ink, printer heads, fusers, laptop & computer parts — GST invoice, COD & fast delivery."}
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link to="/shop" data-testid="hero-shop-btn" className="h-11 px-6 bg-brand-orange text-white rounded-md font-semibold flex items-center gap-2 hover:bg-brand-orange-hover transition-colors">Shop Now <ArrowRight size={18} /></Link>
+            <Link to="/shop?category=printer-consumables" className="h-11 px-6 bg-white/15 border border-white/25 text-white rounded-md font-semibold flex items-center hover:bg-white/25 transition-colors">Toner & Ink</Link>
           </div>
         </div>
       </section>
 
-      {/* Featured categories - bento */}
-      <Section title="Shop by Category" sub="Find parts fast by category" link="/shop">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* Trust strip */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3">
+        {[[BadgeIndianRupee, "GST Invoice"], [Truck, "India-wide Shipping"], [CreditCard, "COD Available"], [ShieldCheck, "Genuine Parts"]].map(([Icon, label], i) => (
+          <div key={i} className="bg-white border border-slate-200 rounded-lg p-3 flex items-center gap-2.5">
+            <Icon size={22} className="text-brand shrink-0" />
+            <span className="text-xs sm:text-sm font-semibold text-slate-700">{label}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Category circles */}
+      <section className="bg-white rounded-lg border border-slate-200 mt-3 p-4">
+        <h2 className="font-display text-lg sm:text-xl font-bold text-ink mb-4">Shop by Category</h2>
+        <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
           {cats.map((c) => (
-            <Link
-              key={c.id}
-              to={`/shop?category=${c.slug}`}
-              data-testid={`home-cat-${c.slug}`}
-              className="group relative aspect-[4/3] rounded-sm overflow-hidden border border-gray-200 bg-gray-900"
-            >
-              <img src={c.image} alt={c.name_en} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-40 group-hover:scale-105 transition-all duration-300" />
-              <div className="absolute inset-0 flex flex-col justify-end p-4">
-                <span className="text-white font-cabinet font-bold text-base md:text-lg leading-tight">{c.name_en}</span>
-                <span className="text-white/70 text-xs mt-0.5">{c.subcategories?.length} types →</span>
+            <Link key={c.id} to={`/shop?category=${c.slug}`} data-testid={`home-cat-${c.slug}`} className="flex flex-col items-center gap-2 group">
+              <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-slate-100 group-hover:border-brand transition-colors">
+                <img src={c.image} alt={c.name_en} className="w-full h-full object-cover" />
               </div>
+              <span className="text-[11px] sm:text-xs text-center text-slate-700 font-medium leading-tight line-clamp-2">{c.name_en}</span>
             </Link>
           ))}
         </div>
-      </Section>
+      </section>
 
-      {/* Best selling */}
-      <Section title="Best Selling Parts" sub="Most ordered by technicians & businesses" link="/shop?sort=rating">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {featured.map((p) => <ProductCard key={p.id} product={p} />)}
+      {/* Shop by printer model */}
+      <section className="bg-white rounded-lg border border-slate-200 mt-3 p-4">
+        <div className="flex items-center gap-2 mb-4">
+          <Printer size={20} className="text-brand" />
+          <h2 className="font-display text-lg sm:text-xl font-bold text-ink">Shop by Printer Model</h2>
         </div>
-      </Section>
+        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1 sm:flex-wrap">
+          {models.map((m) => (
+            <Link key={m.id} to={`/shop?model=${encodeURIComponent(m.model)}`} className="shrink-0 px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-md text-xs sm:text-sm font-medium text-slate-700 hover:border-brand hover:text-brand transition-colors">
+              {m.model}
+            </Link>
+          ))}
+        </div>
+      </section>
 
-      {/* Brands strip */}
-      <Section title="Popular Brands" sub="Compatible parts for top printer & IT brands">
-        <div className="flex flex-wrap gap-3">
+      <Rail title="Best Sellers" link="/shop?sort=rating" products={featured.slice(0, 12)} />
+
+      {/* Brand strip */}
+      <section className="bg-white rounded-lg border border-slate-200 mt-3 p-4">
+        <h2 className="font-display text-lg sm:text-xl font-bold text-ink mb-4">Top Brands</h2>
+        <div className="flex gap-2 overflow-x-auto no-scrollbar sm:flex-wrap">
           {brands.map((b) => (
-            <Link
-              key={b.id}
-              to={`/shop?brand=${b.slug}`}
-              className="px-5 py-3 border border-gray-200 rounded-sm font-cabinet font-bold text-gray-700 hover:border-brand hover:text-brand transition-colors bg-white"
-            >
+            <Link key={b.id} to={`/shop?brand=${b.slug}`} className="shrink-0 px-5 py-3 border border-slate-200 rounded-md font-display font-bold text-slate-600 hover:border-brand hover:text-brand transition-colors bg-white text-sm">
               {b.name}
             </Link>
           ))}
         </div>
-      </Section>
+      </section>
 
-      {/* New arrivals */}
-      <Section title="New Arrivals" sub="Latest additions to our catalog" link="/shop?sort=newest">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {newArr.map((p) => <ProductCard key={p.id} product={p} />)}
-        </div>
-      </Section>
+      <Rail title="New Arrivals" link="/shop?sort=newest" products={newArr.slice(0, 12)} />
 
-      {/* Compatibility CTA */}
-      <section className="bg-gray-50 border-y border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-12 grid md:grid-cols-2 gap-8 items-center">
-          <div>
-            <h2 className="font-cabinet text-2xl md:text-3xl font-bold tracking-tight">Shop by Printer Model</h2>
-            <p className="text-gray-600 mt-2">Search your exact printer or laptop model to find guaranteed-compatible spare parts.</p>
-            <div className="mt-5 flex gap-2 max-w-md">
-              <Link to="/shop?model=HP%20LaserJet" className="px-4 py-2 bg-white border border-gray-300 rounded-sm text-sm hover:border-brand">HP LaserJet</Link>
-              <Link to="/shop?model=Canon" className="px-4 py-2 bg-white border border-gray-300 rounded-sm text-sm hover:border-brand">Canon</Link>
-              <Link to="/shop?model=Epson" className="px-4 py-2 bg-white border border-gray-300 rounded-sm text-sm hover:border-brand">Epson</Link>
-            </div>
-          </div>
-          <div className="grid grid-cols-4 gap-4">
-            {[Printer, Cpu, Laptop, Network].map((Icon, i) => (
-              <div key={i} className="aspect-square bg-white border border-gray-200 rounded-sm flex items-center justify-center">
-                <Icon size={32} className="text-brand" />
-              </div>
-            ))}
-          </div>
+      {/* Blog CTA */}
+      <section className="bg-brand-dark text-white rounded-lg mt-3 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <h2 className="font-display text-xl sm:text-2xl font-bold">Repair Guides & Buying Tips</h2>
+          <p className="text-white/70 text-sm mt-1">Learn which part fixes your printer — from our resource center.</p>
         </div>
+        <Link to="/blog" className="h-11 px-6 bg-white text-brand rounded-md font-semibold flex items-center gap-2 shrink-0">Read the Blog <ArrowRight size={18} /></Link>
       </section>
     </div>
   );

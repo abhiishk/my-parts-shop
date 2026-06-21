@@ -8,18 +8,10 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'cabinet': ['"Cabinet Grotesk"', 'system-ui', 'sans-serif'],
-        'plex': ['"IBM Plex Sans"', 'system-ui', 'sans-serif'],
-        'mono': ['"IBM Plex Mono"', 'monospace'],
-      },
-      colors: {
-        ink: '#111827',
-        brand: {
-          DEFAULT: '#0052FF',
-          hover: '#0040CC',
-          orange: '#FF6B00',
-          'orange-hover': '#E66000',
-        },
+        'cabinet': ['"Outfit"', 'system-ui', 'sans-serif'],
+        'display': ['"Outfit"', 'system-ui', 'sans-serif'],
+        'plex': ['"Mukta"', 'system-ui', 'sans-serif'],
+        'mono': ['"Outfit"', 'monospace'],
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -30,12 +22,13 @@ module.exports = {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         brand: {
-          DEFAULT: '#0052FF',
-          hover: '#0040CC',
-          orange: '#FF6B00',
-          'orange-hover': '#E66000',
+          DEFAULT: '#2B5CC6',
+          hover: '#224A9F',
+          dark: '#1C3E85',
+          orange: '#F5821F',
+          'orange-hover': '#E07015',
         },
-        ink: '#111827',
+        ink: '#0F172A',
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))'
