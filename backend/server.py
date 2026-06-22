@@ -196,7 +196,7 @@ async def list_products(
 
 @api.get("/products/{slug}")
 async def get_product(slug: str):
-    p = await db.products.find_one({"slug": slug}, NO_ID)
+    p = await db.products.find_one({"slug": slug, "publish_status": "published"}, NO_ID)
     if not p:
         raise HTTPException(status_code=404, detail="Product not found")
     related = await db.products.find(
