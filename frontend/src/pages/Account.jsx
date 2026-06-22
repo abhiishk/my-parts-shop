@@ -4,6 +4,7 @@ import { Package, MapPin, LogOut, User, ChevronRight, ShieldCheck } from "lucide
 import { useAuth } from "../context/AuthContext";
 import { api } from "../lib/api";
 import { inr } from "../lib/format";
+import { ADMIN_BASE } from "../lib/routes";
 
 const statusColor = {
   placed: "bg-blue-50 text-brand", confirmed: "bg-indigo-50 text-indigo-600",
@@ -36,7 +37,7 @@ export default function Account() {
         </div>
         <div className="flex gap-2">
           {user.role === "admin" && (
-            <Link to="/admin" className="h-10 px-4 bg-ink text-white rounded-sm text-sm font-medium flex items-center gap-2"><ShieldCheck size={16} /> Admin</Link>
+            <Link to={ADMIN_BASE} className="h-10 px-4 bg-ink text-white rounded-sm text-sm font-medium flex items-center gap-2"><ShieldCheck size={16} /> Admin</Link>
           )}
           <button onClick={() => { logout(); navigate("/"); }} data-testid="logout-button" className="h-10 px-4 border border-gray-300 rounded-sm text-sm font-medium flex items-center gap-2 hover:border-red-400 hover:text-red-600">
             <LogOut size={16} /> Logout

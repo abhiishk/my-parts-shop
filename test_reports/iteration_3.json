@@ -1,0 +1,41 @@
+{
+  "summary": "Iteration_3: Verified all PartStation.in admin upgrade features end-to-end (backend + frontend). Backend: 53 PASS + 1 XFAIL (real visibility bug). Original regression suite (35/35) still PASS. New suite test_admin_upgrades.py (19 tests) covers image upload, auto-SKU, visibility toggle, admin search/filters, import-from-URL, MOQ enforcement, free-shipping qty, low_stock stat. Frontend: secure admin portal at /ops-control/admin/login works; old /admin and /admin/login correctly unrouted; /ops-control/admin redirects to login when logged out; customer /login has no admin reference; dashboard Low-Stock card navigates to /ops-control/admin/products?stock=low_stock; admin product search (HP) returns rows; eye toggle clickable; Add Product modal has all expected testids + working category→subcategory cascade; Import-from-URL preview renders with create-from-url-btn.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "GET /api/products/{slug}", "issue": "Detail endpoint does NOT filter by publish_status, so a hidden (draft) product remains publicly accessible by direct URL. List endpoint already filters correctly. Add `\"publish_status\": \"published\"` to the find_one query at server.py:199."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/backend/tests/test_admin_upgrades.py",
+    "/app/test_reports/pytest/iter3_all.xml"
+  ],
+  "action_items": [
+    "Fix /api/products/{slug} to exclude draft products (single-line filter). Currently the eye-toggle 'hide' only hides from list/storefront grid; a direct slug URL still reveals the product. After fix, remove the xfail marker in test_admin_upgrades.py::TestVisibilityToggle::test_toggle_hides_then_shows."
+  ],
+  "critical_code_review_comments": [
+    "Bug: get_product (server.py:197-206) returns product regardless of publish_status — direct-link bypass of the eye toggle. List endpoint at line 152 filters correctly; mirror the same `publish_status: published` in detail. Related-products query already filters correctly.",
+    "import_from_url returns raw keys (name, price, description, images, mrp, warnings); frontend AdminImport.jsx remaps these. Contract is internal but worth a Pydantic model for stability.",
+    "Auto-SKU _gen_sku uses count_documents+1 as numeric suffix — works but is racy under concurrent product creation. Consider a Mongo $inc counter doc.",
+    "/api/admin/upload stores files in object storage AND inserts a row in db.files but never reuses that record — file_url is just /api/files/{path}; the metadata row is orphaned (minor)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_admin_upgrades.py (new)"
+  ],
+  "success_rate": {
+    "backend": "100% on non-bug paths (53/54 pass, 1 xfail = real bug captured)",
+    "frontend": "100% on tested admin-upgrade flows (admin portal route guard, customer-login no-admin-link, low-stock stat link, eye toggle, admin search, add-product cascade, import-from-URL preview)"
+  },
+  "test_credentials": "Admin admin@partstation.com / Admin@12345 at /ops-control/admin/login. Ephemeral customer registered via /api/auth/register with Test@12345 used for MOQ + order tests.",
+  "seed_data_creation": "test_admin_upgrades.py creates one TEST_AutoSku_Toner product (MOQ=2, free_shipping_qty=5) and cleans it up in a module-scoped teardown fixture. Three test COD orders were created during MOQ tests (PS260610xx). One uploaded image lives in Emergent object storage under partstation/products/.",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Run: pytest /app/backend/tests/ -v (combined regression + new admin upgrades). One XFAIL is expected — it documents the public-detail-bypass bug on /api/products/{slug}. Auto-SKU SKU format is BRAND(2-3)-SUB(2-3)-NNNN. Admin portal lives ONLY at /ops-control/admin (ADMIN_BASE in lib/routes.js); /admin* paths are unrouted on purpose. testids for new admin flows: stat-low, admin-product-search, filter-stock, filter-status, toggle-vis-<SKU>, admin-new-product-btn, pf-name_en, pf-brand, pf-category, pf-subcategory, pf-selling_price, pf-min_order_qty, pf-free_shipping_qty, pf-img-url, pf-upload-btn, pf-file-input, pf-sku, pf-save, import-url-input, fetch-url-btn, fetched-preview, create-from-url-btn.",
+  "rca_of_the_issue": "Visibility bypass: server.py defines two product read endpoints. List (/api/products, line 137) filters {publish_status: 'published'}, but Detail (/api/products/{slug}, line 197) does not. The /admin/products/{id}/visibility PATCH sets draft correctly; the bug is only in the public detail handler. One-line fix: change `await db.products.find_one({\"slug\": slug}, NO_ID)` to `await db.products.find_one({\"slug\": slug, \"publish_status\": \"published\"}, NO_ID)`."
+}

@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Lock, ShieldCheck, ArrowRight } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { BRAND } from "../lib/brand";
+import { ADMIN_BASE } from "../lib/routes";
 
 export default function AdminLogin() {
   const { login, user } = useAuth();
@@ -11,7 +12,7 @@ export default function AdminLogin() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => { if (user?.role === "admin") navigate("/admin"); }, [user, navigate]);
+  useEffect(() => { if (user?.role === "admin") navigate(ADMIN_BASE); }, [user, navigate]);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -19,7 +20,7 @@ export default function AdminLogin() {
     try {
       const u = await login(form);
       if (u.role !== "admin") { setError("This account is not an administrator."); setBusy(false); return; }
-      navigate("/admin");
+      navigate(ADMIN_BASE);
     } catch (e) {
       const d = e.response?.data?.detail;
       setError(typeof d === "string" ? d : "Invalid credentials");

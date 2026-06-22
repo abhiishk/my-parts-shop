@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { ShieldCheck, Truck, BadgeIndianRupee, ArrowRight } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { BRAND } from "../lib/brand";
+import { ADMIN_BASE } from "../lib/routes";
 import { toast } from "sonner";
 
 const SIDE = "https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=900&q=80";
@@ -23,7 +24,7 @@ export default function Login() {
     try {
       const u = mode === "login" ? await login({ email: form.email, password: form.password }) : await register(form);
       toast.success(`Welcome${u.name ? ", " + u.name.split(" ")[0] : ""}!`);
-      navigate(u.role === "admin" ? "/admin" : redirect);
+      navigate(u.role === "admin" ? ADMIN_BASE : redirect);
     } catch (e) {
       const d = e.response?.data?.detail;
       setError(typeof d === "string" ? d : "Authentication failed");
@@ -81,7 +82,6 @@ export default function Login() {
             <button disabled className="w-full h-11 border border-slate-300 rounded-md text-sm text-slate-400 cursor-not-allowed">Continue with Google (coming soon)</button>
             <button disabled className="w-full h-11 border border-slate-300 rounded-md text-sm text-slate-400 cursor-not-allowed">Login with Mobile OTP (coming soon)</button>
           </div>
-          <p className="text-xs text-slate-400 text-center mt-4">Are you an administrator? <Link to="/admin/login" className="text-brand font-semibold">Admin Login</Link></p>
         </div>
       </div>
     </div>

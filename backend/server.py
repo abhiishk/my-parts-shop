@@ -7,6 +7,7 @@ load_dotenv(ROOT_DIR / ".env")
 
 import io
 import csv
+import re
 import logging
 from datetime import datetime, timezone
 from typing import List, Optional
@@ -19,6 +20,8 @@ from pydantic import BaseModel, EmailStr, Field
 import auth as A
 from email_service import send_email, order_placed_html
 from seed_data import seed_all, slugify, now_iso
+import storage
+from scraper import extract_product
 
 mongo_url = os.environ["MONGO_URL"]
 client = AsyncIOMotorClient(mongo_url)
@@ -258,16 +261,25 @@ async def create_order(body: OrderIn, user: dict = Depends(get_current_user)):
     if not body.items:
         raise HTTPException(status_code=400, detail="Cart is empty")
     items = []
+    free_ship = False
     for ci in body.items:
         p = await db.products.find_one({"id": ci.product_id}, NO_ID)
         if not p:
             raise HTTPException(status_code=400, detail=f"Product not found: {ci.product_id}")
+        moq = int(p.get("min_order_qty", 1) or 1)
+        if ci.qty < moq:
+            raise HTTPException(status_code=400, detail=f"Minimum order quantity for {p['name_en']} is {moq}")
+        fsq = int(p.get("free_shipping_qty", 0) or 0)
+        if fsq and ci.qty >= fsq:
+            free_ship = True
         items.append({
             "product_id": p["id"], "sku": p["sku"], "name_en": p["name_en"], "name_hi": p["name_hi"],
             "slug": p["slug"], "image": (p["images"][0] if p.get("images") else ""),
             "selling_price": p["selling_price"], "gst_rate": p["gst_rate"], "qty": ci.qty,
         })
     ship = await _compute_shipping(body.address.pincode, sum(i["selling_price"] * i["qty"] for i in items))
+    if free_ship:
+        ship["shipping_charge"] = 0
     if body.payment_method == "cod" and not ship["cod_available"]:
         raise HTTPException(status_code=400, detail="COD not available for this pincode")
     subtotal, tax_total = _gst_breakdown(items)
@@ -378,7 +390,44 @@ async def get_settings():
     return s or {}
 
 
+@api.get("/files/{path:path}")
+async def serve_file(path: str):
+    try:
+        data, content_type = storage.get_object(path)
+    except Exception:
+        raise HTTPException(status_code=404, detail="File not found")
+    return Response(content=data, media_type=content_type,
+                    headers={"Cache-Control": "public, max-age=31536000"})
+
+
 # ---------------- ADMIN ----------------
+@api.post("/admin/upload")
+async def admin_upload(file: UploadFile = File(...), admin: dict = Depends(require_admin)):
+    ext = (file.filename.rsplit(".", 1)[-1] if "." in (file.filename or "") else "").lower()
+    if ext not in storage.ALLOWED_EXT:
+        raise HTTPException(status_code=400, detail=f"Unsupported file type. Allowed: {', '.join(sorted(storage.ALLOWED_EXT))}")
+    data = await file.read()
+    if len(data) > 8 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="Image too large (max 8MB)")
+    path = f"{storage.APP_NAME}/products/{A.new_id()}.{ext}"
+    try:
+        result = storage.put_object(path, data, storage.MIME_TYPES[ext])
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Upload failed: {e}")
+    await db.files.insert_one({"id": A.new_id(), "storage_path": result["path"],
+                              "original_filename": file.filename, "content_type": storage.MIME_TYPES[ext],
+                              "size": result.get("size", len(data)), "created_at": now_iso()})
+    return {"path": result["path"], "file_url": f"/api/files/{result['path']}"}
+
+
+@api.post("/admin/import/from-url")
+async def admin_import_from_url(data: dict, admin: dict = Depends(require_admin)):
+    url = (data.get("url") or "").strip()
+    if not url.startswith("http"):
+        raise HTTPException(status_code=400, detail="Enter a valid product URL (http/https)")
+    return extract_product(url)
+
+
 @api.get("/admin/stats")
 async def admin_stats(admin: dict = Depends(require_admin)):
     orders = await db.orders.find({}, NO_ID).to_list(10000)
@@ -397,18 +446,45 @@ async def admin_stats(admin: dict = Depends(require_admin)):
 
 
 @api.get("/admin/products")
-async def admin_products(admin: dict = Depends(require_admin), q: Optional[str] = None, page: int = 1, limit: int = 20):
+async def admin_products(admin: dict = Depends(require_admin), q: Optional[str] = None,
+                         stock: Optional[str] = None, status: Optional[str] = None, page: int = 1, limit: int = 20):
     query = {}
     if q:
-        query = {"$or": [{"name_en": {"$regex": q, "$options": "i"}}, {"sku": {"$regex": q, "$options": "i"}}]}
+        query["$or"] = [
+            {"name_en": {"$regex": q, "$options": "i"}},
+            {"sku": {"$regex": q, "$options": "i"}},
+            {"part_number": {"$regex": q, "$options": "i"}},
+            {"brand": {"$regex": q, "$options": "i"}},
+            {"category": {"$regex": q, "$options": "i"}},
+            {"compatible_models": {"$regex": q, "$options": "i"}},
+        ]
+    if stock:
+        query["stock_status"] = stock
+    if status:
+        query["publish_status"] = status
     total = await db.products.count_documents(query)
     items = await db.products.find(query, NO_ID).sort("created_at", -1).skip((page - 1) * limit).limit(limit).to_list(limit)
     return {"items": items, "total": total, "page": page, "pages": (total + limit - 1) // limit}
 
 
+async def _gen_sku(brand: str, sub: str, category: str):
+    def abbr(s, n=3):
+        a = re.sub(r"[^A-Za-z0-9]", "", (s or "")).upper()
+        return a[:n] or "GEN"
+    brand_a = abbr(brand, 3)
+    cat_a = abbr(sub or category, 3)
+    n = await db.products.count_documents({}) + 1
+    sku = f"{brand_a}-{cat_a}-{n:04d}"
+    while await db.products.find_one({"sku": sku}):
+        n += 1
+        sku = f"{brand_a}-{cat_a}-{n:04d}"
+    return sku
+
+
 def _product_defaults(data: dict):
     name = data.get("name_en", "Product")
     base_slug = data.get("slug") or slugify(name)
+    qty = int(data.get("stock_qty", 0) or 0)
     return {
         "id": data.get("id") or A.new_id(),
         "sku": data.get("sku", ""),
@@ -425,8 +501,10 @@ def _product_defaults(data: dict):
         "images": data.get("images", []),
         "mrp": float(data.get("mrp", 0) or 0), "selling_price": float(data.get("selling_price", 0) or 0),
         "gst_rate": float(data.get("gst_rate", 18) or 18),
-        "stock_qty": int(data.get("stock_qty", 0) or 0),
-        "stock_status": "in_stock" if int(data.get("stock_qty", 0) or 0) > 5 else ("low_stock" if int(data.get("stock_qty", 0) or 0) > 0 else "out_of_stock"),
+        "stock_qty": qty,
+        "stock_status": "in_stock" if qty > 5 else ("low_stock" if qty > 0 else "out_of_stock"),
+        "min_order_qty": max(1, int(data.get("min_order_qty", 1) or 1)),
+        "free_shipping_qty": int(data.get("free_shipping_qty", 0) or 0),
         "weight": float(data.get("weight", 0.5) or 0.5),
         "cod_allowed": bool(data.get("cod_allowed", True)),
         "pincode_shipping_group": data.get("pincode_shipping_group", "default"),
@@ -446,6 +524,8 @@ def _product_defaults(data: dict):
 @api.post("/admin/products")
 async def create_product(data: dict, admin: dict = Depends(require_admin)):
     doc = _product_defaults(data)
+    if not doc["sku"]:
+        doc["sku"] = await _gen_sku(doc["brand"], doc["subcategory"], doc["category"])
     if await db.products.find_one({"slug": doc["slug"]}):
         doc["slug"] = f"{doc['slug']}-{doc['id'][:6]}"
     await db.products.insert_one({**doc})
@@ -459,8 +539,20 @@ async def update_product(product_id: str, data: dict, admin: dict = Depends(requ
         raise HTTPException(status_code=404, detail="Product not found")
     merged = {**existing, **data, "id": product_id}
     doc = _product_defaults(merged)
+    if not doc["sku"]:
+        doc["sku"] = await _gen_sku(doc["brand"], doc["subcategory"], doc["category"])
     await db.products.update_one({"id": product_id}, {"$set": doc})
     return doc
+
+
+@api.patch("/admin/products/{product_id}/visibility")
+async def toggle_visibility(product_id: str, admin: dict = Depends(require_admin)):
+    p = await db.products.find_one({"id": product_id}, NO_ID)
+    if not p:
+        raise HTTPException(status_code=404, detail="Product not found")
+    new_status = "draft" if p.get("publish_status") == "published" else "published"
+    await db.products.update_one({"id": product_id}, {"$set": {"publish_status": new_status}})
+    return {"publish_status": new_status}
 
 
 @api.delete("/admin/products/{product_id}")
@@ -737,6 +829,11 @@ async def startup():
     await db.users.create_index("email", unique=True)
     await db.products.create_index("slug", unique=True)
     await db.products.create_index("category_slug")
+    try:
+        storage.init_storage()
+        logger.info("Object storage initialized")
+    except Exception as e:
+        logger.error(f"Storage init failed: {e}")
     await _seed_admin()
     await seed_all(db)
     logger.info("PartStation startup complete")

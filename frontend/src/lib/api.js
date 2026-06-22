@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+export { BACKEND_URL };
 export const API = `${BACKEND_URL}/api`;
 
 const client = axios.create({ baseURL: API });
@@ -51,6 +52,9 @@ export const api = {
   adminCreateProduct: (data) => client.post("/admin/products", data).then((r) => r.data),
   adminUpdateProduct: (id, data) => client.put(`/admin/products/${id}`, data).then((r) => r.data),
   adminDeleteProduct: (id) => client.delete(`/admin/products/${id}`).then((r) => r.data),
+  adminToggleVisibility: (id) => client.patch(`/admin/products/${id}/visibility`).then((r) => r.data),
+  adminUploadImage: (formData) => client.post("/admin/upload", formData).then((r) => r.data),
+  adminImportFromUrl: (url) => client.post("/admin/import/from-url", { url }).then((r) => r.data),
   adminImportCsv: (formData) => client.post("/admin/products/import-csv", formData).then((r) => r.data),
   adminImportLogs: () => client.get("/admin/import-logs").then((r) => r.data),
   importTemplateUrl: `${API}/admin/products/import-template`,

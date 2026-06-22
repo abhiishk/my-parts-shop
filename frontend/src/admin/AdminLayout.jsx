@@ -3,18 +3,19 @@ import { NavLink, Outlet, useNavigate, Link } from "react-router-dom";
 import { LayoutDashboard, Package, Upload, FolderTree, Tag, ShoppingBag, Users, MapPin, FileText, Settings, LogOut, ExternalLink, Menu, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { BRAND } from "../lib/brand";
+import { ADMIN_BASE, ADMIN_LOGIN } from "../lib/routes";
 
 const nav = [
-  { to: "/admin", end: true, icon: LayoutDashboard, label: "Dashboard" },
-  { to: "/admin/products", icon: Package, label: "Products" },
-  { to: "/admin/import", icon: Upload, label: "Bulk Import" },
-  { to: "/admin/categories", icon: FolderTree, label: "Categories" },
-  { to: "/admin/brands", icon: Tag, label: "Brands" },
-  { to: "/admin/orders", icon: ShoppingBag, label: "Orders" },
-  { to: "/admin/customers", icon: Users, label: "Customers" },
-  { to: "/admin/pincodes", icon: MapPin, label: "Shipping / Pincodes" },
-  { to: "/admin/blog", icon: FileText, label: "Blog" },
-  { to: "/admin/settings", icon: Settings, label: "Settings" },
+  { to: ADMIN_BASE, end: true, icon: LayoutDashboard, label: "Dashboard" },
+  { to: `${ADMIN_BASE}/products`, icon: Package, label: "Products" },
+  { to: `${ADMIN_BASE}/import`, icon: Upload, label: "Bulk Import" },
+  { to: `${ADMIN_BASE}/categories`, icon: FolderTree, label: "Categories" },
+  { to: `${ADMIN_BASE}/brands`, icon: Tag, label: "Brands" },
+  { to: `${ADMIN_BASE}/orders`, icon: ShoppingBag, label: "Orders" },
+  { to: `${ADMIN_BASE}/customers`, icon: Users, label: "Customers" },
+  { to: `${ADMIN_BASE}/pincodes`, icon: MapPin, label: "Shipping / Pincodes" },
+  { to: `${ADMIN_BASE}/blog`, icon: FileText, label: "Blog" },
+  { to: `${ADMIN_BASE}/settings`, icon: Settings, label: "Settings" },
 ];
 
 export default function AdminLayout() {
@@ -23,7 +24,7 @@ export default function AdminLayout() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (!loading && (!user || user.role !== "admin")) navigate("/admin/login");
+    if (!loading && (!user || user.role !== "admin")) navigate(ADMIN_LOGIN);
   }, [user, loading, navigate]);
 
   if (loading || !user) return <div className="min-h-screen flex items-center justify-center text-slate-400 bg-slate-900">Loading…</div>;
@@ -44,7 +45,7 @@ export default function AdminLayout() {
       </nav>
       <div className="p-3 border-t border-white/10 space-y-1">
         <Link to="/" className="flex items-center gap-2 px-2 py-2 text-sm hover:text-white"><ExternalLink size={16} /> View Store</Link>
-        <button onClick={() => { logout(); navigate("/admin/login"); }} className="flex items-center gap-2 px-2 py-2 text-sm hover:text-red-400 w-full"><LogOut size={16} /> Logout</button>
+        <button onClick={() => { logout(); navigate(ADMIN_LOGIN); }} className="flex items-center gap-2 px-2 py-2 text-sm hover:text-red-400 w-full"><LogOut size={16} /> Logout</button>
       </div>
     </aside>
   );
@@ -57,7 +58,7 @@ export default function AdminLayout() {
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-slate-900 text-white h-14 flex items-center justify-between px-4">
         <button onClick={() => setOpen(true)} data-testid="admin-menu-btn"><Menu size={24} /></button>
         <span className="font-display font-extrabold">PartStation<span className="text-brand-orange">.in</span> Admin</span>
-        <button onClick={() => { logout(); navigate("/admin/login"); }}><LogOut size={20} /></button>
+        <button onClick={() => { logout(); navigate(ADMIN_LOGIN); }}><LogOut size={20} /></button>
       </div>
       {open && (
         <div className="lg:hidden fixed inset-0 z-50">

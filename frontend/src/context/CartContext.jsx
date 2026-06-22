@@ -17,11 +17,12 @@ export function CartProvider({ children }) {
     localStorage.setItem("ps_cart", JSON.stringify(items));
   }, [items]);
 
-  const addItem = (product, qty = 1) => {
+  const addItem = (product, qty) => {
+    const q = qty || product.min_order_qty || 1;
     setItems((prev) => {
       const existing = prev.find((i) => i.product_id === product.id);
       if (existing) {
-        return prev.map((i) => (i.product_id === product.id ? { ...i, qty: i.qty + qty } : i));
+        return prev.map((i) => (i.product_id === product.id ? { ...i, qty: i.qty + q } : i));
       }
       return [
         ...prev,
@@ -35,6 +36,7 @@ export function CartProvider({ children }) {
           selling_price: product.selling_price,
           mrp: product.mrp,
           gst_rate: product.gst_rate,
+          min_order_qty: product.min_order_qty || 1,
           qty,
         },
       ];
@@ -43,8 +45,12 @@ export function CartProvider({ children }) {
   };
 
   const updateQty = (product_id, qty) => {
-    if (qty < 1) return removeItem(product_id);
-    setItems((prev) => prev.map((i) => (i.product_id === product_id ? { ...i, qty } : i)));
+    setItems((prev) => prev.map((i) => {
+      if (i.product_id !== product_id) return i;
+      const min = i.min_order_qty || 1;
+      if (qty < min) return i;
+      return { ...i, qty };
+    }));
   };
 
   const removeItem = (product_id) => setItems((prev) => prev.filter((i) => i.product_id !== product_id));

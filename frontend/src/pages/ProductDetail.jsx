@@ -113,6 +113,8 @@ export default function ProductDetail() {
             <ul className="text-xs text-slate-600 space-y-1.5">
               <li>• GST Invoice available for input tax credit</li>
               <li>• Cash on Delivery available on eligible pincodes</li>
+              {product.min_order_qty > 1 && <li>• Minimum order quantity: <b>{product.min_order_qty} units</b></li>}
+              {product.free_shipping_qty > 0 && <li>• <b>Free delivery</b> on ordering {product.free_shipping_qty}+ units</li>}
               <li>• {product.warranty || "Limited"} warranty — keep your invoice for claims</li>
             </ul>
           </div>

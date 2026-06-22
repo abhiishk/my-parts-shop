@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Package, ShoppingBag, Users, IndianRupee, AlertTriangle, Clock } from "lucide-react";
 import { api } from "../lib/api";
 import { inr } from "../lib/format";
+import { ADMIN_BASE } from "../lib/routes";
 
 const statusColor = {
   placed: "bg-blue-50 text-brand", confirmed: "bg-indigo-50 text-indigo-600",
@@ -17,24 +18,31 @@ export default function AdminDashboard() {
 
   const cards = [
     { icon: IndianRupee, label: "Revenue", value: inr(stats.revenue), color: "text-emerald-600" },
-    { icon: ShoppingBag, label: "Orders", value: stats.orders, color: "text-brand" },
-    { icon: Package, label: "Products", value: stats.products, color: "text-indigo-600" },
-    { icon: Users, label: "Customers", value: stats.customers, color: "text-amber-600" },
-    { icon: Clock, label: "Pending Orders", value: stats.pending_orders, color: "text-orange-600" },
-    { icon: AlertTriangle, label: "Low Stock", value: stats.low_stock, color: "text-red-600" },
+    { icon: ShoppingBag, label: "Orders", value: stats.orders, color: "text-brand", to: `${ADMIN_BASE}/orders` },
+    { icon: Package, label: "Products", value: stats.products, color: "text-indigo-600", to: `${ADMIN_BASE}/products` },
+    { icon: Users, label: "Customers", value: stats.customers, color: "text-amber-600", to: `${ADMIN_BASE}/customers` },
+    { icon: Clock, label: "Pending Orders", value: stats.pending_orders, color: "text-orange-600", to: `${ADMIN_BASE}/orders` },
+    { icon: AlertTriangle, label: "Low Stock", value: stats.low_stock, color: "text-red-600", to: `${ADMIN_BASE}/products?stock=low_stock` },
   ];
 
   return (
     <div>
-      <h1 className="font-cabinet text-2xl font-bold mb-6">Dashboard</h1>
+      <h1 className="font-display text-2xl font-bold mb-6">Dashboard</h1>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-        {cards.map((c) => (
-          <div key={c.label} className="bg-white border border-gray-200 rounded-sm p-4">
-            <c.icon size={22} className={c.color} />
-            <div className="font-cabinet font-black text-2xl mt-2">{c.value}</div>
-            <div className="text-xs text-gray-500">{c.label}</div>
-          </div>
-        ))}
+        {cards.map((c) => {
+          const Inner = (
+            <>
+              <c.icon size={22} className={c.color} />
+              <div className="font-display font-extrabold text-2xl mt-2">{c.value}</div>
+              <div className="text-xs text-slate-500 flex items-center gap-1">{c.label}{c.to && <span className="text-brand">›</span>}</div>
+            </>
+          );
+          return c.to ? (
+            <Link key={c.label} to={c.to} data-testid={`stat-${c.label.toLowerCase().split(" ")[0]}`} className="bg-white border border-slate-200 rounded-lg p-4 hover:border-brand hover:shadow-sm transition-all">{Inner}</Link>
+          ) : (
+            <div key={c.label} className="bg-white border border-slate-200 rounded-lg p-4">{Inner}</div>
+          );
+        })}
       </div>
 
       <div className="bg-white border border-gray-200 rounded-sm">

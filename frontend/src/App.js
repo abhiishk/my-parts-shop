@@ -22,6 +22,7 @@ import StaticPage from "./pages/StaticPage";
 
 import AdminLayout from "./admin/AdminLayout";
 import AdminLogin from "./admin/AdminLogin";
+import { ADMIN_BASE, ADMIN_LOGIN } from "./lib/routes";
 import AdminDashboard from "./admin/AdminDashboard";
 import AdminProducts from "./admin/AdminProducts";
 import AdminImport from "./admin/AdminImport";
@@ -57,9 +58,9 @@ function App() {
                 </Route>
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path={ADMIN_LOGIN} element={<AdminLogin />} />
 
-                <Route path="/admin" element={<AdminLayout />}>
+                <Route path={ADMIN_BASE} element={<AdminLayout />}>
                   <Route index element={<AdminDashboard />} />
                   <Route path="products" element={<AdminProducts />} />
                   <Route path="import" element={<AdminImport />} />
