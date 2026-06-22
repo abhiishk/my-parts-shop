@@ -19,13 +19,19 @@ Company: **PartStation.in** — tagline "Your Parts Destination". Domain target:
 - Auth: JWT Bearer token in localStorage key `ps_token` (Authorization header). Admin guard on /api/admin/*.
 - Mongo collections: users, products, categories, brands, orders, pincode_rules, blog_posts, settings, import_logs, email_logs.
 
-## Implemented (2026-06-21) — Phase 1 MVP
-- Catalog: categories (8) + subcategories, brands (8), 25 seeded products with specs/compatible models/GST/stock.
-- Storefront: Home (hero, category bento, best-selling, brands, new arrivals, shop-by-model), Shop (filters: category/subcategory/brand/max-price/sort/search + pagination), Product detail (gallery, specs table, SKU/part no, GST split, pincode checker, compatible models, related), Cart, Checkout (address + pincode shipping + GST summary + COD), Order success, Account (orders + addresses), Order detail with tracking timeline + GST tax-invoice modal, Wishlist, Blog list/detail, static pages (about/contact/faq/policies), EN/HI toggle, WhatsApp float.
-- Admin: Dashboard (stats), Products CRUD + modal form, Bulk CSV import (template download, mapping, report, history), Categories, Brands, Orders (status update + tracking + email trigger), Customers, Pincode shipping rules, Blog manager, Business/GST/shipping/social/GA4 settings.
-- GST invoices: per-line taxable value + GST breakdown via /api/orders/{id}/invoice.
-- Branding: user-provided PartStation.in logo + tagline across header/footer/admin/login.
-- QA: backend 35/35 pytest passed; frontend flows verified; fixed checkout->order-success redirect race.
+## Implemented (2026-06-21) — Phase 1 MVP + Professional Redesign
+### Phase 1 MVP
+- Catalog, storefront, admin, GST invoices, pincode shipping, JWT auth, CSV import, blog, EN/HI.
+
+### Redesign + UX upgrade (Flipkart/Amazon-inspired)
+- New professional theme: brand blue #2B5CC6 + orange #F5821F, Outfit + Mukta fonts.
+- Mobile-first: marketplace header (utility bar + orange search + category nav), mobile bottom tab nav, mobile drawer, sticky mobile Add-to-Cart/Buy-Now on PDP, responsive grids/rails.
+- Home redesigned: hero, trust strip, category circles, **Shop by Printer Model** chips, Best Sellers + New Arrivals rails, brand strip, blog CTA.
+- Product cards (rating badge, %off, MRP strikethrough), PDP with offers/highlights/specs/compatible-models.
+- **Separate dark Admin portal at /admin/login** (fixes admin-login confusion); AdminLayout responsive with mobile drawer.
+- Customer login page redesigned (split hero panel).
+- Catalog expanded to **40 products** with real Indian printer brands & models (HP LaserJet 1020/M1005/M1136/P1108, Canon LBP2900/MF3010/iR2520, Epson L3110/L360/L380, Brother HL-L2321D, Samsung, Ricoh, Kyocera, Pantum, TVS, etc.); new /api/printer-models endpoint; versioned reseed.
+- QA: backend 35/35; frontend 100% on tested flows (admin login, dashboard, 9 admin pages, search-by-printer-model, full purchase flow, PDP). Verified order-success redirect fix.
 
 ## Backlog (prioritized)
 ### P0 (needs user keys / later phase)
