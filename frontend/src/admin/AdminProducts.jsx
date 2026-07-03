@@ -58,6 +58,7 @@ function ProductForm({ initial, cats, brands, onClose, onSaved }) {
     (f.specs_str || "").split("\n").forEach((l) => { const i = l.indexOf(":"); if (i > 0) specs[l.slice(0, i).trim()] = l.slice(i + 1).trim(); });
     const payload = {
       ...f, category: activeCat ? activeCat.name_en : f.category,
+      category_id: activeCat ? activeCat.id : (f.category_id || ""),
       mrp: Number(f.mrp) || 0, selling_price: Number(f.selling_price), gst_rate: Number(f.gst_rate),
       stock_qty: Number(f.stock_qty), min_order_qty: Number(f.min_order_qty) || 1, free_shipping_qty: Number(f.free_shipping_qty) || 0,
       weight: Number(f.weight),

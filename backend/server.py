@@ -495,6 +495,7 @@ def _product_defaults(data: dict):
         "long_description": data.get("long_description", ""),
         "brand": data.get("brand", "Generic"), "brand_slug": slugify(data.get("brand", "generic")),
         "category": data.get("category", ""), "category_slug": data.get("category_slug") or slugify(data.get("category", "")),
+        "category_id": data.get("category_id", ""),
         "subcategory": data.get("subcategory", ""),
         "compatible_models": data.get("compatible_models", []),
         "technical_specs": data.get("technical_specs", {}),
@@ -524,6 +525,10 @@ def _product_defaults(data: dict):
 @api.post("/admin/products")
 async def create_product(data: dict, admin: dict = Depends(require_admin)):
     doc = _product_defaults(data)
+    if not doc["category_id"] and doc["category_slug"]:
+        cat = await db.categories.find_one({"slug": doc["category_slug"]}, NO_ID)
+        if cat:
+            doc["category_id"] = cat["id"]
     if not doc["sku"]:
         doc["sku"] = await _gen_sku(doc["brand"], doc["subcategory"], doc["category"])
     if await db.products.find_one({"slug": doc["slug"]}):
